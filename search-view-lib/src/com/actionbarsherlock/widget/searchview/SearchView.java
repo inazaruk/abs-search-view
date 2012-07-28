@@ -9,6 +9,7 @@ import android.app.SearchableInfo;
 import android.content.Context;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.CursorAdapter;
 import android.widget.LinearLayout;
@@ -36,10 +37,17 @@ public class SearchView extends ForwardingSearchView {
      * Some of the methods are only supported since 14 or 16 api levels. 
      * This implementation does not try to backport this functionality 
      * to all api levels since 11. If something is not implemented at current level, it will 
-     * throw exception at runtime.
+     * throw exception at runtime (which is currently caught and printed to log).
      */
     @TargetApi(11)
     private static class NativeSearchViewAdapter extends LinearLayout implements ISearchView {
+        
+        private static final String TAG = android.widget.SearchView.class.getSimpleName();
+        
+        /* TODO: do we want to handle such errors? For now: yes. */
+        private static final boolean HANDLE_NO_SUCH_METHOD_ERROR = true;
+        private static final String HANDLE_MSG = "SearchView's %s() is not supported on this platform.";
+        
         private android.widget.SearchView mNativeSearchView;
               
         public NativeSearchViewAdapter(Context context, AttributeSet attrs) {
@@ -52,25 +60,59 @@ public class SearchView extends ForwardingSearchView {
         @TargetApi(14)
         @Override
         public void setImeOptions(int imeOptions) {
-            mNativeSearchView.setImeOptions(imeOptions);
+            try {
+                mNativeSearchView.setImeOptions(imeOptions);
+            } catch(NoSuchMethodError ex) {
+                if (HANDLE_NO_SUCH_METHOD_ERROR) {
+                    Log.e(TAG, String.format(HANDLE_MSG, "setImeOptions"), ex);
+                } else {
+                    throw ex;
+                }
+            }
         }
 
         @TargetApi(16)
         @Override
         public int getImeOptions() {
-            return mNativeSearchView.getImeOptions();
+            try {
+                return mNativeSearchView.getImeOptions();
+            } catch(NoSuchMethodError ex) {
+                if (HANDLE_NO_SUCH_METHOD_ERROR) {
+                    Log.e(TAG, String.format(HANDLE_MSG, "getImeOptions"), ex);
+                    return -1;
+                } else {
+                    throw ex;
+                }
+            }
         }
 
         @TargetApi(14)
         @Override
         public void setInputType(int inputType) {
-            mNativeSearchView.setInputType(inputType);            
+            try {
+                mNativeSearchView.setInputType(inputType);
+            } catch(NoSuchMethodError ex) {
+                if (HANDLE_NO_SUCH_METHOD_ERROR) {
+                    Log.e(TAG, String.format(HANDLE_MSG, "setInputType"), ex);
+                } else {
+                    throw ex;
+                }
+            }
         }
 
         @TargetApi(16)
         @Override
         public int getInputType() {
-            return mNativeSearchView.getInputType();
+            try {
+                return mNativeSearchView.getInputType();
+            } catch(NoSuchMethodError ex) {
+                if (HANDLE_NO_SUCH_METHOD_ERROR) {
+                    Log.e(TAG, String.format(HANDLE_MSG, "getInputType"), ex);
+                    return -1;
+                } else {
+                    throw ex;
+                }
+            }
         }
 
         @Override
@@ -91,7 +133,16 @@ public class SearchView extends ForwardingSearchView {
         @TargetApi(16)
         @Override
         public CharSequence getQueryHint() {
-            return mNativeSearchView.getQueryHint();
+            try {
+                return mNativeSearchView.getQueryHint();
+            } catch(NoSuchMethodError ex) {
+                if (HANDLE_NO_SUCH_METHOD_ERROR) {
+                    Log.e(TAG, String.format(HANDLE_MSG, "getQueryHint"), ex);
+                    return null;
+                } else {
+                    throw ex;
+                }
+            }
         }
 
         @Override
@@ -152,7 +203,16 @@ public class SearchView extends ForwardingSearchView {
         @TargetApi(16)
         @Override
         public int getMaxWidth() {
-            return mNativeSearchView.getMaxWidth();
+            try {
+                return mNativeSearchView.getMaxWidth();
+            } catch(NoSuchMethodError ex) {
+                if (HANDLE_NO_SUCH_METHOD_ERROR) {
+                    Log.e(TAG, String.format(HANDLE_MSG, "getMaxWidth"), ex);
+                    return -1;
+                } else {
+                    throw ex;
+                }
+            }
         }
 
         @Override
